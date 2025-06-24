@@ -1,238 +1,184 @@
-<!-- BEGIN INS­MARK RITPRIJS & OFFERTE WIDGET -->
-<style>
-  #ritprijs-widget {
-    max-width: 520px;
-    margin: 40px auto;
-    padding: 32px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-  }
-  #ritprijs-widget h3 {
-    font-size: 1.75rem;
-    text-align: center;
-    margin-bottom: 24px;
-    color: #0073e6;
-  }
-  #ritprijs-form {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
-    gap: 16px;
-  }
-  #ritprijs-form label {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9rem;
-  }
-  #ritprijs-form input,
-  #ritprijs-form select {
-    margin-top: 8px;
-    padding: 10px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    transition: border-color .2s;
-  }
-  #ritprijs-form input:focus,
-  #ritprijs-form select:focus {
-    border-color: #0073e6;
-    outline: none;
-  }
-  .full-width { grid-column: 1 / -1; }
-  #distance-field { display: none; }
-  #button-row {
-    grid-column: 1 / -1;
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-  }
-  #button-row button {
-    flex: 1;
-    padding: 14px 0;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  #calculate-btn {
-    background: #0073e6;
-    color: #fff;
-  }
-  #calculate-btn:hover { background: #005bb5; }
-  #offer-btn {
-    background: #28a745;
-    color: #fff;
-    display: none;
-  }
-  #offer-btn:hover { background: #1e7e34; }
-  #result {
-    grid-column: 1 / -1;
-    margin-top: 16px;
-    padding: 14px;
-    background: #e6f4ff;
-    border: 1px solid #b3daff;
-    border-radius: 6px;
-    font-weight: 600;
-    color: #005bb5;
-    text-align: center;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uitgebreide Ritprijs Wizard</title>
+  <style>
+    body { font-family: sans-serif; background: #f2f3f5; margin: 0; padding: 0; }
+    .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin-bottom:24px; }
+    fieldset { display: none; border: none; padding: 0; }
+    fieldset.active { display: block; }
+    .buttons { margin-top: 24px; display: flex; justify-content: space-between; }
+    .buttons button { padding: 10px 20px; border:none; border-radius:6px; background:#0073e6; color:white; cursor:pointer; }
+    .buttons button[disabled] { background:#ccc; cursor:not-allowed; }
+    label { display:block; margin-bottom:12px; }
+    input, select { width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px; }
+    .add-package { margin:12px 0; text-align:right; }
+    .package { border:1px solid #ddd; padding:12px; margin-bottom:12px; border-radius:4px; background:#f9f9f9; }
+  </style>
+</head>
+<body>
 
-<div id="ritprijs-widget">
-  <h3>Bereken uw ritprijs</h3>
-  <form id="ritprijs-form">
-    <label class="full-width">Naam
-      <input id="customer-name" name="Naam" type="text" required placeholder="Voor- en achternaam">
-    </label>
-    <label class="full-width">Telefoonnummer
-      <input id="phone" name="Telefoon" type="tel" required placeholder="06-1234-5678">
-    </label>
-    <label class="full-width">E-mail
-      <input id="email" name="E-mail" type="email" required placeholder="naam@voorbeeld.nl">
-    </label>
-    <label class="full-width">Ophaaladres
-      <input id="pickup-address" name="Ophaaladres" type="text" required placeholder="Straat, nr, plaats">
-    </label>
-    <label class="full-width">Afleveradres
-      <input id="delivery-address" name="Afleveradres" type="text" required placeholder="Straat, nr, plaats">
-    </label>
-    <label id="distance-field">Afstand (km)
-      <input id="distance" name="Afstand" type="number" step="0.1" readonly>
-    </label>
-    <label>Gewicht (kg)
-      <input id="weight" name="Gewicht" type="number" step="0.1" required placeholder="bv. 5.0">
-    </label>
-    <label class="full-width">Lengte × Breedte × Hoogte (cm)
-      <div style="display:flex;gap:8px;">
-        <input id="length" name="Lengte" type="number" placeholder="L">
-        <input id="width"  name="Breedte" type="number" placeholder="B">
-        <input id="height" name="Hoogte" type="number" placeholder="H">
+  <div class="container">
+    <h1>Ritprijs Berekenen</h1>
+    <form id="wizard-form">
+      <!-- Stap 1: Adressen -->
+      <fieldset class="active">
+        <h2>1. Adressen</h2>
+        <label>Ophaaladres
+          <input id="origin-input" name="Ophaaladres" type="text" required placeholder="Straat, huisnr., plaats">
+        </label>
+        <label>Afleveradres
+          <input id="destination-input" name="Afleveradres" type="text" required placeholder="Straat, huisnr., plaats">
+        </label>
+      </fieldset>
+
+      <!-- Stap 2: Pakketten -->
+      <fieldset>
+        <h2>2. Pakketten</h2>
+        <div id="packages"></div>
+        <div class="add-package">
+          <button type="button" id="add-package-btn">+ Pak toevoegen</button>
+        </div>
+      </fieldset>
+
+      <!-- Stap 3: Ophalen details -->
+      <fieldset>
+        <h2>3. Ophalen Details</h2>
+        <label>Verdieping Ophalen
+          <input name="OphVerf" type="number" min="0" value="0">
+        </label>
+        <label>Gebouwtype Ophalen
+          <select name="GebTypeOp">
+            <option>Woning</option><option>Bedrijf</option><option>Magazijn</option><option>Veiling</option>
+          </select>
+        </label>
+        <label>
+          <input name="LiftOp" type="checkbox"> Lift aanwezig bij ophalen?
+        </label>
+      </fieldset>
+
+      <!-- Stap 4: Afleveren details -->
+      <fieldset>
+        <h2>4. Afleveren Details</h2>
+        <label>Verdieping Afleveren
+          <input name="AfvVerf" type="number" min="0" value="0">
+        </label>
+        <label>Gebouwtype Afleveren
+          <select name="GebTypeAf">
+            <option>Woning</option><option>Bedrijf</option><option>Magazijn</option><option>Veiling</option>
+          </select>
+        </label>
+        <label>
+          <input name="LiftAf" type="checkbox"> Lift aanwezig bij afleveren?
+        </label>
+      </fieldset>
+
+      <!-- Stap 5: Extra hulp -->
+      <fieldset>
+        <h2>5. Extra Hulp</h2>
+        <label>
+          <input name="ExtraHulp" type="checkbox"> Extra hulp nodig (bv. dragen, inpakken)?
+        </label>
+        <label>Opmerkingen
+          <textarea name="Opmerkingen" rows="3" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;"></textarea>
+        </label>
+      </fieldset>
+
+      <!-- Stap 6: Contact -->
+      <fieldset>
+        <h2>6. Contactgegevens</h2>
+        <label>Naam
+          <input name="Naam" type="text" required placeholder="Voor- en achternaam">
+        </label>
+        <label>Telefoon
+          <input name="Telefoon" type="tel" required placeholder="06-1234-5678">
+        </label>
+        <label>E-mail
+          <input name="E-mail" type="email" required placeholder="naam@voorbeeld.nl">
+        </label>
+      </fieldset>
+
+      <!-- Navigatie knoppen -->
+      <div class="buttons">
+        <button type="button" id="prev-btn" disabled>Terug</button>
+        <button type="button" id="next-btn">Volgende</button>
       </div>
-    </label>
-    <label>Ophalen verdieping
-      <input id="pickup-floor" name="OphVerf" type="number" min="0" value="0">
-    </label>
-    <label>Afleveren verdieping
-      <input id="delivery-floor" name="AfvVerf" type="number" min="0" value="0">
-    </label>
-    <label>Gebouwtype Ophalen
-      <select id="building-pickup" name="GebTypeOp">
-        <option>Woning</option><option>Bedrijf</option><option>Magazijn</option><option>Veiling</option>
-      </select>
-    </label>
-    <label>Gebouwtype Afleveren
-      <select id="building-delivery" name="GebTypeAf">
-        <option>Woning</option><option>Bedrijf</option><option>Magazijn</option><option>Veiling</option>
-      </select>
-    </label>
+    </form>
+  </div>
 
-    <!-- Verborgen veld voor prijs die we later meesturen -->
-    <input type="hidden" name="Prijs" id="price">
+  <script>
+    // Wizard navigatie
+    const fieldsets = document.querySelectorAll('fieldset');
+    let current = 0;
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
 
-    <div id="button-row">
-      <button type="button" id="calculate-btn" disabled>Bereken prijs</button>
-      <button type="button" id="offer-btn">Offerte aanvragen</button>
-    </div>
-    <div id="result"></div>
-  </form>
-</div>
+    function showStep(idx){
+      fieldsets.forEach((fs,i)=> fs.classList.toggle('active', i===idx));
+      prevBtn.disabled = idx===0;
+      nextBtn.textContent = idx===fieldsets.length-1 ? 'Verstuur' : 'Volgende';
+    }
 
-<script>
-  // Formspree-ID (vul je eigen “f/…” ID in)
-  const FORM_ID = 'f/JE_FORM_ID_HIER';
-
-  // Google Autocomplete + DistanceMatrix setup
-  let locA=null, locB=null;
-  function initRitprijs(){
-    const aInp = document.getElementById('pickup-address');
-    const bInp = document.getElementById('delivery-address');
-    const btn   = document.getElementById('calculate-btn');
-    const acA = new google.maps.places.Autocomplete(aInp,{componentRestrictions:{country:'nl'}});
-    const acB = new google.maps.places.Autocomplete(bInp,{componentRestrictions:{country:'nl'}});
-    acA.addListener('place_changed',()=>{
-      locA = acA.getPlace().geometry?.location||null;
-      btn.disabled = !(locA && locB);
-    });
-    acB.addListener('place_changed',()=>{
-      locB = acB.getPlace().geometry?.location||null;
-      btn.disabled = !(locA && locB);
-    });
-
-    btn.addEventListener('click',()=>{
-      // vraag afstand op
-      const svc = new google.maps.DistanceMatrixService();
-      svc.getDistanceMatrix({
-        origins:      [locA],
-        destinations: [locB],
-        travelMode:   'DRIVING',
-        unitSystem:   google.maps.UnitSystem.METRIC,
-      },(resp,status)=>{
-        if(status!=='OK'
-           ||!resp.rows.length
-           || resp.rows[0].elements[0].status!=='OK'){
-          return alert('Afstands­berekening mislukt.');
-        }
-        const el = resp.rows[0].elements[0];
-        const km = (el.distance.value/1000).toFixed(1);
-        // toon afstandveld
-        document.getElementById('distance-field').style.display='block';
-        document.getElementById('distance').value = km;
-
-        // prijsberekening
-        const d = parseFloat(km);
-        const w = parseFloat(form.Gewicht.value);
-        const l = parseFloat(form.Lengte.value)||0;
-        const wi= parseFloat(form.Breedte.value)||0;
-        const h = parseFloat(form.Hoogte.value)||0;
-        const vol = (l/100)*(wi/100)*(h/100);
-        const pf = parseInt(form.OphVerf.value,10);
-        const df = parseInt(form.AfvVerf.value,10);
-        const bp = form.GebTypeOp.value;
-        const bd = form.GebTypeAf.value;
-        const base=30, pkm=1, pkg=0.4, pfloor=5;
-        const sur = {Woning:5, Bedrijf:0, Magazijn:10, Veiling:7.5};
-        let prijs = base + pkm*d + pkg*Math.max(w,vol) + pfloor*(pf+df)
-                   + sur[bp] + sur[bd];
-        prijs = prijs.toFixed(2);
-
-        document.getElementById('result').innerText =
-          `Geschatte prijs: €${prijs}`;
-        document.getElementById('price').value = prijs;
-        document.getElementById('offer-btn').style.display='inline-block';
-      });
-    });
-
-    // offerte aanvragen
-    document.getElementById('offer-btn').addEventListener('click',()=>{
-      if(FORM_ID==='f/JE_FORM_ID_HIER'){
-        return alert('Vul je Formspree-ID in de code.');
+    prevBtn.onclick = ()=> { if(current>0){ current--; showStep(current); } };
+    nextBtn.onclick = ()=>{
+      const fs = fieldsets[current];
+      if(![...fs.querySelectorAll('[required]')].every(i=>i.value.trim()!=='')) {
+        fs.querySelector('[required]').focus();
+        return alert('Vul eerst alle verplichte velden in.');
       }
-      const frm = document.getElementById('ritprijs-form');
-      const data = new FormData(frm);
-      fetch(`https://formspree.io/${FORM_ID}`,{
-        method:'POST', body: data, headers:{'Accept':'application/json'}
-      }).then(res=>res.json().then(json=>{
-        if(res.ok){
-          document.getElementById('result').innerText=
-            'Bedankt! Uw offerteaanvraag is verzonden.';
-          frm.reset();
-          document.getElementById('distance-field').style.display='none';
-          document.getElementById('offer-btn').style.display='none';
-          document.getElementById('calculate-btn').disabled=true;
-        } else {
-          alert(json.error||'Er is iets misgegaan.');
-        }
-      }));
-    });
-  }
-</script>
+      if(current < fieldsets.length-1){
+        current++;
+        showStep(current);
+      } else {
+        // finale submit
+        alert('Formulier verzonden met alle data:\n'+
+          JSON.stringify(Object.fromEntries(new FormData(document.getElementById('wizard-form'))), null,2)
+        );
+        // hier kun je fetch('/jouw-endpoint',...) doen
+      }
+    };
+    showStep(0);
 
-<!-- laad Google Maps & Places -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initRitprijs"
-  async defer>
-</script>
-<!-- EIND INS­MARK WIDGET -->
+    // Google Autocomplete init
+    let aLoc,bLoc;
+    function initAutocomplete(){
+      const aIn = document.getElementById('origin-input')||document.querySelector('input[name="Ophaaladres"]');
+      const bIn = document.getElementById('destination-input')||document.querySelector('input[name="Afleveradres"]');
+      const acA = new google.maps.places.Autocomplete(aIn,{componentRestrictions:{country:'nl'}});
+      const acB = new google.maps.places.Autocomplete(bIn,{componentRestrictions:{country:'nl'}});
+      acA.addListener('place_changed',()=>{ aLoc = acA.getPlace().geometry?.location || null; });
+      acB.addListener('place_changed',()=>{ bLoc = acB.getPlace().geometry?.location || null; });
+    }
+
+    // Pakketten dynamisch toevoegen
+    document.getElementById('add-package-btn').addEventListener('click',()=>{
+      const idx = document.querySelectorAll('.package').length + 1;
+      const div = document.createElement('div');
+      div.className = 'package';
+      div.innerHTML = `
+        <h4>Pakket ${idx}</h4>
+        <label>Gewicht (kg)
+          <input name="Gewicht_${idx}" type="number" step="0.1" required>
+        </label>
+        <label>Afmetingen (L×B×H, cm)
+          <div style="display:flex;gap:8px;">
+            <input name="Lengte_${idx}" type="number" step="0.1" required placeholder="L">
+            <input name="Breedte_${idx}" type="number" step="0.1" required placeholder="B">
+            <input name="Hoogte_${idx}" type="number" step="0.1" required placeholder="H">
+          </div>
+        </label>
+      `;
+      document.getElementById('packages').append(div);
+    });
+    // alvast één pakket
+    document.getElementById('add-package-btn').click();
+  </script>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
+    async defer></script>
+</body>
+</html>
