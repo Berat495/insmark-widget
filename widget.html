@@ -5,81 +5,47 @@
   <title>Bezorgprijscalculator</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    * { box-sizing: border-box; margin:0; padding:0 }
-    html, body { font-family:"Helvetica Neue",Arial,sans-serif; background:#f5f5f5 }
+    * { box-sizing:border-box; margin:0; padding:0 }
+    body { font-family:Arial,sans-serif; background:#f5f5f5 }
     .container {
-      max-width:800px;
-      margin:40px auto;
-      padding:0 20px;
+      max-width:800px; margin:40px auto; padding:0 20px;
     }
     h1 {
-      text-align:center;
-      margin-bottom:24px;
-      font-size:2rem;
+      text-align:center; margin-bottom:24px; font-size:2rem;
     }
     .steps {
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:24px;
+      display:flex; justify-content:space-between; margin-bottom:24px;
     }
     .step {
-      width:32px; height:32px;
-      border-radius:50%;
-      background:#ddd;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:bold;
-      color:#555;
+      width:32px; height:32px; border-radius:50%;
+      background:#ddd; display:flex; align-items:center;
+      justify-content:center; font-weight:bold; color:#555;
     }
-    .step.active {
-      background:#2a9d8f;
-      color:#fff;
-    }
+    .step.active { background:#2a9d8f; color:#fff; }
     .form {
-      background:#fff;
-      padding:24px;
-      border-radius:8px;
+      background:#fff; padding:24px; border-radius:8px;
       box-shadow:0 2px 8px rgba(0,0,0,0.1);
-      display:grid;
-      grid-template-columns:1fr 1fr auto;
-      gap:16px;
+      display:grid; grid-template-columns:1fr 1fr auto; gap:16px;
       align-items:end;
     }
     .form label {
-      display:block;
-      font-weight:bold;
-      margin-bottom:4px;
+      display:block; font-weight:bold; margin-bottom:4px;
     }
     .form input {
-      width:100%;
-      padding:8px;
-      border:1px solid #ccc;
-      border-radius:4px;
+      width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;
     }
     .btn {
-      background:#2a9d8f;
-      color:#fff;
-      border:none;
-      padding:12px 24px;
-      font-size:1rem;
-      border-radius:4px;
-      cursor:pointer;
+      background:#2a9d8f; color:#fff; border:none; padding:12px 24px;
+      font-size:1rem; border-radius:4px; cursor:pointer;
       opacity:0.6;
     }
-    .btn.enabled {
-      opacity:1;
-    }
+    .btn.enabled { opacity:1; }
     .result {
-      text-align:center;
-      margin-top:24px;
-      font-size:1.5rem;
+      text-align:center; margin-top:24px; font-size:1.5rem;
       display:none;
     }
     .result span {
-      font-weight:bold;
-      font-size:2rem;
-      color:#e76f51;
+      font-weight:bold; font-size:2rem; color:#e76f51;
     }
   </style>
 </head>
@@ -110,67 +76,58 @@
     </div>
   </div>
 
-  <!-- Google Maps JS API met callback -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
-    async defer>
-  </script>
-
+  <!-- 1) Definieer initAutocomplete als globale functie -->
   <script>
-    let autocompleteOrigin, autocompleteDest;
-    let originPlace, destPlace;
-
     function initAutocomplete() {
-      autocompleteOrigin = new google.maps.places.Autocomplete(
-        document.getElementById('origin'),
-        { types: ['geocode'] }
-      );
-      autocompleteDest = new google.maps.places.Autocomplete(
-        document.getElementById('destination'),
-        { types: ['geocode'] }
-      );
-      autocompleteOrigin.addListener('place_changed', () => {
-        originPlace = autocompleteOrigin.getPlace();
+      const originInput      = document.getElementById('origin');
+      const destInput        = document.getElementById('destination');
+      const autocompleteOrig = new google.maps.places.Autocomplete(originInput,      { types: ['geocode'] });
+      const autocompleteDest = new google.maps.places.Autocomplete(destInput, { types: ['geocode'] });
+      let originPlace, destPlace;
+
+      autocompleteOrig.addListener('place_changed', () => {
+        originPlace = autocompleteOrig.getPlace();
         checkReady();
       });
       autocompleteDest.addListener('place_changed', () => {
         destPlace = autocompleteDest.getPlace();
         checkReady();
       });
-    }
 
-    function checkReady() {
-      const btn = document.getElementById('calculate');
-      if (originPlace?.geometry && destPlace?.geometry) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      }
-    }
-
-    function calculateDistanceAndPrice() {
-      new google.maps.DistanceMatrixService().getDistanceMatrix({
-        origins:      [ originPlace.formatted_address ],
-        destinations: [ destPlace.formatted_address ],
-        travelMode:   'DRIVING',
-        unitSystem:   google.maps.UnitSystem.METRIC,
-      }, (response, status) => {
-        if (status !== 'OK' || response.rows[0].elements[0].status !== 'OK') {
-          alert('Er is iets misgegaan bij het opvragen van de afstand.');
-          return;
+      function checkReady() {
+        const btn = document.getElementById('calculate');
+        if (originPlace?.geometry && destPlace?.geometry) {
+          btn.disabled = false;
+          btn.classList.add('enabled');
         }
-        const meters = response.rows[0].elements[0].distance.value;
-        const km     = meters / 1000;
-        // Tarief: €2,50 per km, minimum €15
-        let price = Math.max(15, km * 2.5);
-        document.getElementById('priceVal').textContent = price.toFixed(2);
-        document.getElementById('output').style.display = 'block';
+      }
+
+      document.getElementById('calculate')
+              .addEventListener('click', () => {
+        new google.maps.DistanceMatrixService().getDistanceMatrix({
+          origins:      [ originPlace.formatted_address ],
+          destinations: [ destPlace.formatted_address ],
+          travelMode:   'DRIVING',
+          unitSystem:   google.maps.UnitSystem.METRIC,
+        }, (response, status) => {
+          if (status!=='OK' || response.rows[0].elements[0].status!=='OK') {
+            alert('Er is iets misgegaan bij het opvragen van de afstand.');
+            return;
+          }
+          const meters = response.rows[0].elements[0].distance.value;
+          const km     = meters / 1000;
+          let prijs    = Math.max(15, km * 2.5);  // €2,50 per km, min €15
+          document.getElementById('priceVal').textContent = prijs.toFixed(2);
+          document.getElementById('output').style.display  = 'block';
+        });
       });
     }
+  </script>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('calculate')
-              .addEventListener('click', calculateDistanceAndPrice);
-    });
+  <!-- 2) Laad de Maps-bibliotheek met key + places + callback -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete&v=weekly"
+    async defer>
   </script>
 </body>
 </html>
