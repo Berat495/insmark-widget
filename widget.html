@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Offerte Ritprijs Insmark</title>
   <style>
     /* -------- Basis -------- */
     *, *::before, *::after { box-sizing: border-box }
     body {
       font-family: Arial, sans-serif;
-      background: #fff;
+      background: #fff; /* wit, net als site */
       margin: 0; padding: 0;
     }
     #widget {
       max-width: 640px;
-      margin: 40px auto;
-      padding: 32px;
+      margin: 24px auto;
+      padding: 24px;
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 6px 24px rgba(0,0,0,0.1);
@@ -72,7 +72,7 @@
     .buttons {
       display: flex;
       gap: 12px;
-      margin-top: 24px;
+      margin-top: 16px;
     }
     .buttons button {
       flex: 1;
@@ -90,26 +90,23 @@
     /* ------ Pakketten ------ */
     #packages-container {
       margin-bottom: 16px;
-      border: 1px solid #ddd;
-      padding: 16px;
-      border-radius: 6px;
-      background: #fafafa;
     }
     .package-entry {
       position: relative;
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .package-entry:last-child {
-      border-bottom: none;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fafafa;
     }
     .remove-package {
       position: absolute;
-      top: 12px; right: 0;
+      top: 8px; right: 8px;
       background: none;
       border: none;
       color: #e74c3c;
-      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
       cursor: pointer;
     }
 
@@ -129,18 +126,17 @@
     .price {
       text-align: center;
       font-size: 1.2rem;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
       color: #0073e6;
       font-weight: bold;
     }
 
-    /* ===== Mobiel ===== */
+    /* ------ Responsief ------ */
     @media (max-width: 480px) {
-      #widget { padding: 16px 12px; }
+      #widget { margin: 0; border-radius: 0; }
       .buttons { flex-direction: column; }
       .buttons button { width: 100%; }
-      .dim-group { flex-direction: column; }
-    } 
+    }
   </style>
 </head>
 <body>
@@ -160,38 +156,35 @@
         action="https://formspree.io/f/xvgrwnbl"
         method="POST">
 
-    <!-- STAP 1: Adressen & Afstand -->
+    <!-- stap 1: adressen & afstand -->
     <div class="step-content active" data-step="1">
       <label><span>Ophaaladres</span>
-        <input id="pickup-address" name="Ophaaladres" type="text" required>
+        <input id="pickup-address" name="Ophaaladres" type="text" required placeholder="Straat en huisnummer, plaats">
       </label>
       <label><span>Afleveradres</span>
-        <input id="delivery-address" name="Afleveradres" type="text" required>
+        <input id="delivery-address" name="Afleveradres" type="text" required placeholder="Straat en huisnummer, plaats">
       </label>
       <label><span>Afstand (km)</span>
-        <input id="distance" name="Afstand" type="text" readonly>
+        <input id="distance" name="Afstand" type="text" readonly placeholder="Klik op Bereken afstand">
       </label>
       <div class="buttons">
-        <button type="button" class="next" id="btn-calc-distance">
-          Bereken afstand
-        </button>
+        <button type="button" class="next" id="btn-calc-distance">Bereken afstand →</button>
       </div>
     </div>
 
-    <!-- STAP 2: Pakketten -->
+    <!-- stap 2: pakket details -->
     <div class="step-content" data-step="2">
-      <button type="button" id="add-package" class="next"
-              style="background:#0073e6; color:#fff; margin-bottom:16px;">
+      <div id="packages-container"></div>
+      <button type="button" class="next" id="add-package" style="background:#0073e6;color:#fff;margin-bottom:16px;">
         + Pakket toevoegen
       </button>
-      <div id="packages-container"></div>
       <div class="buttons">
-        <button type="button" class="prev">Vorige</button>
-        <button type="button" class="next">Volgende</button>
+        <button type="button" class="prev">← Vorige</button>
+        <button type="button" class="next">Volgende →</button>
       </div>
     </div>
 
-    <!-- STAP 3: Verdiepingen -->
+    <!-- stap 3: verdieping -->
     <div class="step-content" data-step="3">
       <label><span>Ophalen verdieping</span>
         <input name="OphalenVerdieping" type="number" min="0" value="0">
@@ -200,12 +193,12 @@
         <input name="AfleverenVerdieping" type="number" min="0" value="0">
       </label>
       <div class="buttons">
-        <button type="button" class="prev">Vorige</button>
-        <button type="button" class="next">Volgende</button>
+        <button type="button" class="prev">← Vorige</button>
+        <button type="button" class="next">Volgende →</button>
       </div>
     </div>
 
-    <!-- STAP 4: Gebouwtypes -->
+    <!-- stap 4: gebouwtypes -->
     <div class="step-content" data-step="4">
       <label><span>Gebouwtype ophalen</span>
         <select name="GebouwTypeOphalen">
@@ -224,36 +217,38 @@
         </select>
       </label>
       <div class="buttons">
-        <button type="button" class="prev">Vorige</button>
-        <button type="button" class="next">Volgende</button>
+        <button type="button" class="prev">← Vorige</button>
+        <button type="button" class="next">Volgende →</button>
       </div>
     </div>
 
-    <!-- STAP 5: Extra hulp & Lift -->
+    <!-- stap 5: extra hulp & lift -->
     <div class="step-content" data-step="5">
       <label><span>Extra hulp nodig?</span>
         <select name="ExtraHulp">
-          <option>Nee</option><option>Ja</option>
+          <option>Nee</option>
+          <option>Ja</option>
         </select>
       </label>
       <label><span>Lift aanwezig?</span>
         <select name="LiftAanwezig">
-          <option>Ja</option><option>Nee</option>
+          <option>Ja</option>
+          <option>Nee</option>
         </select>
       </label>
       <div class="buttons">
-        <button type="button" class="prev">Vorige</button>
-        <button type="button" class="next">Volgende</button>
+        <button type="button" class="prev">← Vorige</button>
+        <button type="button" class="next">Volgende →</button>
       </div>
     </div>
 
-    <!-- STAP 6: Samenvatting & Contact -->
+    <!-- stap 6: samenvatting & contact & verstuur -->
     <div class="step-content" data-step="6">
       <div class="summary" id="summary-box"></div>
       <div class="price" id="price-box"></div>
 
-      <!-- Contactgegevens -->
-      <label><span>Uw naam</span>
+      <!-- contactgegevens -->
+      <label><span>Naam</span>
         <input name="Naam" type="text" required placeholder="Voor- en achternaam">
       </label>
       <label><span>Telefoonnummer</span>
@@ -264,141 +259,166 @@
       </label>
 
       <div class="buttons">
-        <button type="button" class="prev">Vorige</button>
+        <button type="button" class="prev">← Vorige</button>
         <button type="submit" class="submit">Verstuur aanvraag</button>
       </div>
     </div>
 
+    <!-- hidden voor reply-to -->
     <input type="hidden" name="_replyto" id="hidden-replyto">
   </form>
 </div>
 
 
 <script>
-  // ---- Stapnavigatie ----
+  // ---- stappen logica ----
   let currentStep = 1;
+  const totalSteps = 6;
+  const steps = document.querySelectorAll('.step');
+  const contents = document.querySelectorAll('.step-content');
   function showStep(n) {
-    document.querySelectorAll('.step')
-      .forEach((s,i)=> s.classList.toggle('active', i===n-1));
-    document.querySelectorAll('.step-content')
-      .forEach(c=> c.classList.remove('active'));
+    steps.forEach((s,i)=> s.classList.toggle('active', i===n-1));
+    contents.forEach(c=> c.classList.remove('active'));
     document.querySelector(`.step-content[data-step="${n}"]`)
-      .classList.add('active');
+            .classList.add('active');
     currentStep = n;
+    if (n===6) fillSummary();
   }
-  document.querySelectorAll('.next').forEach(b=> b.onclick = ()=>{
-    if (currentStep < 6) showStep(currentStep+1);
-    if (currentStep+1 === 6) buildSummary();
-  });
-  document.querySelectorAll('.prev').forEach(b=> b.onclick = ()=>{
-    if (currentStep > 1) showStep(currentStep-1);
-  });
-  showStep(1);
+  document.querySelectorAll('.next').forEach(btn=>
+    btn.onclick = ()=> { if(currentStep<totalSteps) showStep(currentStep+1); }
+  );
+  document.querySelectorAll('.prev').forEach(btn=>
+    btn.onclick = ()=> { if(currentStep>1) showStep(currentStep-1); }
+  );
 
-  // ---- Autocomplete & afstand ----
-  let pickupLatLng, deliveryLatLng, distanceKm = 0;
-  function initAutocomplete(){
-    const pAC = new google.maps.places.Autocomplete(
+  // ---- Google Maps Autocomplete & Afstand ----
+  let pickupLatLng=null, deliveryLatLng=null, distanceKm=0;
+  function initAutocomplete() {
+    const pInput = new google.maps.places.Autocomplete(
       document.getElementById('pickup-address'),
-      {componentRestrictions:{country:'nl'}}
+      { componentRestrictions:{ country:'nl' } }
     );
-    const dAC = new google.maps.places.Autocomplete(
+    const dInput = new google.maps.places.Autocomplete(
       document.getElementById('delivery-address'),
-      {componentRestrictions:{country:'nl'}}
+      { componentRestrictions:{ country:'nl' } }
     );
-    pAC.addListener('place_changed', ()=> pickupLatLng = pAC.getPlace().geometry?.location );
-    dAC.addListener('place_changed', ()=> deliveryLatLng = dAC.getPlace().geometry?.location );
-    document.getElementById('btn-calc-distance').onclick = ()=>{
-      if (!pickupLatLng||!deliveryLatLng)
+    pInput.addListener('place_changed', ()=> {
+      const pl = pInput.getPlace();
+      pickupLatLng = pl.geometry?.location||null;
+    });
+    dInput.addListener('place_changed', ()=> {
+      const pl = dInput.getPlace();
+      deliveryLatLng = pl.geometry?.location||null;
+    });
+
+    document.getElementById('btn-calc-distance')
+      .addEventListener('click', ()=> {
+      if (!pickupLatLng||!deliveryLatLng) {
         return alert('Selecteer eerst geldige adressen.');
+      }
       new google.maps.DistanceMatrixService().getDistanceMatrix({
-        origins: [pickupLatLng],
+        origins:      [pickupLatLng],
         destinations: [deliveryLatLng],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC
-      }, (r,s)=>{
-        if (s!=='OK'||
-            r.rows[0].elements[0].status!=='OK')
-          return alert('Afstand kon niet bepaald worden.');
-        distanceKm = r.rows[0].elements[0].distance.value/1000;
-        document.getElementById('distance').value = distanceKm.toFixed(1)+' km';
-        document.getElementById('hidden-replyto').value =
-          document.querySelector('input[type=email]')?.value||'';
+        travelMode:   google.maps.TravelMode.DRIVING,
+        unitSystem:   google.maps.UnitSystem.METRIC
+      }, (resp,status)=>{
+        if (status!=='OK' || !resp.rows.length
+            || resp.rows[0].elements[0].status!=='OK') {
+          return alert('Kon afstand niet ophalen.');
+        }
+        distanceKm = resp.rows[0].elements[0].distance.value/1000;
+        document.getElementById('distance')
+                .value = distanceKm.toFixed(1)+' km';
+        document.getElementById('hidden-replyto')
+                .value = ''; // optie: auto invullen uit e-mail veld later
         showStep(2);
       });
-    };
+    });
   }
 
-  // ---- Dynamisch pakketten ----
+  // ---- Pakket toevoegen/verwijderen ----
   let pkgCount = 0;
   const pkgContainer = document.getElementById('packages-container');
-  document.getElementById('add-package').onclick = ()=>{
+  document.getElementById('add-package').onclick = addPackage;
+  function addPackage(){
     pkgCount++;
     const div = document.createElement('div');
     div.className = 'package-entry';
     div.innerHTML = `
-      <button type="button" class="remove-package">
-        Verwijder pakket
-      </button>
-      <label><span>Gewicht (kg)</span>
-        <input name="Gewicht_${pkgCount}" type="number" step="0.1" required>
+      <button type="button" class="remove-package" title="Verwijder pakket">×</button>
+      <label><span>Pakket ${pkgCount} — Gewicht (kg)</span>
+        <input name="Gewicht[]" type="number" step="0.1" required>
       </label>
       <label><span>Afmetingen L×B×H (cm)</span>
         <div style="display:flex;gap:8px">
-          <input name="Lengte_${pkgCount}" type="number" min="0" placeholder="L" required>
-          <input name="Breedte_${pkgCount}" type="number" min="0" placeholder="B" required>
-          <input name="Hoogte_${pkgCount}" type="number" min="0" placeholder="H" required>
+          <input name="Lengte[]" type="number" min="0" required placeholder="L">
+          <input name="Breedte[]" type="number" min="0" required placeholder="B">
+          <input name="Hoogte[]" type="number" min="0" required placeholder="H">
         </div>
-      </label>`;
-    div.querySelector('.remove-package').onclick = ()=> div.remove();
-    pkgContainer.append(div);
-  };
-  document.getElementById('add-package').click();
+      </label>
+    `;
+    div.querySelector('.remove-package').onclick = ()=> {
+      pkgContainer.removeChild(div);
+    };
+    pkgContainer.appendChild(div);
+  }
 
   // ---- Samenvatting & prijs ----
-  function buildSummary(){
+  function fillSummary(){
     const f = document.getElementById('ritprijs-form');
-    let totalKg=0, totalM3=0;
-    document.querySelectorAll('.package-entry').forEach((el,i)=>{
-      const idx = i+1;
-      const kg = parseFloat(f[`Gewicht_${idx}`].value)||0;
-      const L  = parseFloat(f[`Lengte_${idx}`].value)||0;
-      const B  = parseFloat(f[`Breedte_${idx}`].value)||0;
-      const H  = parseFloat(f[`Hoogte_${idx}`].value)||0;
-      totalKg += kg;
-      totalM3 += (L*B*H)/1e6;
+    // Som van alle gewichten en volumes
+    const gewichten = Array.from(f.querySelectorAll('input[name="Gewicht[]"]'))
+      .map(i=>parseFloat(i.value)||0);
+    const volumeres = Array.from(f.querySelectorAll('div.package-entry')).map(div=>{
+      const L = parseFloat(div.querySelector('input[name="Lengte[]"]').value)||0;
+      const B = parseFloat(div.querySelector('input[name="Breedte[]"]').value)||0;
+      const H = parseFloat(div.querySelector('input[name="Hoogte[]"]').value)||0;
+      return (L/100)*(B/100)*(H/100); // m³
     });
+    const totalKg = gewichten.reduce((a,b)=>a+b,0);
+    const totalVol = volumeres.reduce((a,b)=>a+b,0);
+    // prijs = basis + km + 0.4×max(kg,vol×1000)
     const prijs = (
-      30 + distanceKm*1 +
-      0.4 * Math.max(totalKg, totalM3*1000)
+      30 + distanceKm + 0.4*Math.max(totalKg, totalVol*1000)
     ).toFixed(2);
 
-    document.getElementById('summary-box').innerHTML = `
-      <p><strong>Ophaal:</strong> ${f.Ophaaladres.value}</p>
-      <p><strong>Aflever:</strong> ${f.Afleveradres.value}</p>
-      <p><strong>Afstand:</strong> ${distanceKm.toFixed(1)} km</p>
-      <p><strong>Gewicht totaal:</strong> ${totalKg.toFixed(1)} kg</p>
-      <p><strong>Volume totaal:</strong> ${(totalM3*1000).toFixed(0)} l</p>
-      <p><strong>Verdiepingen:</strong> Ophalen ${f.OphalenVerdieping.value}, Afleveren ${f.AfleverenVerdieping.value}</p>
-      <p><strong>Gebouwtypes:</strong> Ophalen ${f.GebouwTypeOphalen.value}, Afleveren ${f.GebouwTypeAfleveren.value}</p>
-      <p><strong>Extra hulp:</strong> ${f.ExtraHulp.value}, Lift: ${f.LiftAanwezig.value}</p>`;
-    document.getElementById('price-box').textContent = `Geschatte ritprijs: € ${prijs}`;
+    // Samenvatting tekst
+    let html = `
+      <p>Afstand: ${distanceKm.toFixed(1)} km</p>
+      <p>Totaal gewicht: ${totalKg.toFixed(1)} kg</p>
+      <p>Totaal volume: ${(totalVol*1000).toFixed(0)} liter</p>
+      <p>Verzonden pakketten: ${gewichten.length}</p>
+    `;
+    document.getElementById('summary-box').innerHTML = html;
+    document.getElementById('price-box').innerText =
+      'Geschatte ritprijs: € ' + prijs;
 
+    // Zet verborgen prijsveld
     let inp = f.querySelector('input[name="Prijs"]');
     if (!inp) {
       inp = document.createElement('input');
-      inp.type='hidden'; inp.name='Prijs';
-      f.append(inp);
+      inp.type = 'hidden'; inp.name = 'Prijs';
+      f.appendChild(inp);
     }
     inp.value = prijs;
+    // ook afstand als numeriek
+    let inp2 = f.querySelector('input[name="AfstandNum"]');
+    if (!inp2) {
+      inp2 = document.createElement('input');
+      inp2.type = 'hidden'; inp2.name = 'AfstandNum';
+      f.appendChild(inp2);
+    }
+    inp2.value = distanceKm.toFixed(1);
   }
+
+  // Kickoff
+  showStep(1);
 </script>
 
+<!-- Google Maps JS + Places -->
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc
-    &libraries=places&callback=initAutocomplete"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
   async defer>
 </script>
-
 </body>
 </html>
