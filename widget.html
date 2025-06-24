@@ -1,50 +1,87 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bezorgprijscalculator</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    /* copy precies de styles uit het vorige voorbeeld */
-    * { box-sizing:border-box; margin:0; padding:0 }
-    body { font-family:Arial,sans-serif; background:#f5f5f5 }
-    .container { max-width:800px; margin:40px auto; padding:0 20px }
-    h1 { text-align:center; margin-bottom:24px; font-size:2rem }
-    .steps { display:flex; justify-content:space-between; margin-bottom:24px }
+    /* Basis‐styling */
+    body {
+      font-family: sans-serif;
+      background: #f3f3f3;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .title {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+    }
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
     .step {
-      width:32px; height:32px; border-radius:50%;
-      background:#ddd; display:flex; align-items:center;
-      justify-content:center; font-weight:bold; color:#555;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ddd;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
     }
-    .step.active { background:#2a9d8f; color:#fff }
-    .form {
-      background:#fff; padding:24px; border-radius:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
-      display:grid; grid-template-columns:1fr 1fr auto; gap:16px;
-      align-items:end;
+    .step.active {
+      background: #3c9;
+      color: #fff;
     }
-    .form label { display:block; font-weight:bold; margin-bottom:4px }
-    .form input {
-      width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;
+    .inputs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
     }
-    .btn {
-      background:#2a9d8f; color:#fff; border:none; padding:12px 24px;
-      font-size:1rem; border-radius:4px; cursor:pointer;
-      opacity:0.6;
+    .inputs input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
     }
-    .btn.enabled { opacity:1 }
-    .result {
-      text-align:center; margin-top:24px; font-size:1.5rem;
-      display:none;
+    .inputs button {
+      padding: 0 20px;
+      background: #3c9;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    .result span {
-      font-weight:bold; font-size:2rem; color:#e76f51;
+    .inputs button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    #output {
+      margin-top: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Bezorgprijscalculator</h1>
+  <div class="card">
+    <div class="title">Bereken uw ritprijs</div>
     <div class="steps">
       <div class="step active">1</div>
       <div class="step">2</div>
@@ -53,80 +90,85 @@
       <div class="step">5</div>
       <div class="step">6</div>
     </div>
-
-    <div class="form">
-      <div>
-        <label for="origin">Van</label>
-        <input id="origin" type="text" placeholder="Straat, postcode of plaats">
-      </div>
-      <div>
-        <label for="destination">Naar</label>
-        <input id="destination" type="text" placeholder="Straat, postcode of plaats">
-      </div>
-      <button id="calculate" class="btn" disabled>Bereken prijs →</button>
+    <div class="inputs">
+      <input id="origin-input"  type="text" placeholder="Ophaaladres"   />
+      <input id="dest-input"    type="text" placeholder="Afleveradres" />
+      <button id="calculate-btn" disabled>Bereken prijs →</button>
     </div>
-
-    <div id="output" class="result">
-      € <span id="priceVal">0.00</span>
-    </div>
+    <div id="output"></div>
   </div>
 
+  <!-- Google Maps JS + Places -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places"
+    async defer>
+  </script>
   <script>
-    function initAutocomplete() {
-      const originInput      = document.getElementById('origin');
-      const destInput        = document.getElementById('destination');
-      const autocompleteOrig = new google.maps.places.Autocomplete(originInput);
-      const autocompleteDest = new google.maps.places.Autocomplete(destInput);
-      let originPlace, destPlace;
+    let originPlace = null;
+    let destPlace   = null;
 
-      autocompleteOrig.addListener('place_changed', () => {
-        originPlace = autocompleteOrig.getPlace();
-        updateButtonState();
+    // Wacht tot de API geladen is
+    window.initAutocomplete = () => {
+      const originInput = document.getElementById('origin-input');
+      const destInput   = document.getElementById('dest-input');
+      const calcBtn     = document.getElementById('calculate-btn');
+      const output      = document.getElementById('output');
+
+      const originAC = new google.maps.places.Autocomplete(originInput, { types: ['address'] });
+      const destAC   = new google.maps.places.Autocomplete(destInput,   { types: ['address'] });
+
+      originAC.addListener('place_changed', () => {
+        originPlace = originAC.getPlace();
+        checkReady();
       });
-      autocompleteDest.addListener('place_changed', () => {
-        destPlace = autocompleteDest.getPlace();
-        updateButtonState();
+      destAC.addListener('place_changed', () => {
+        destPlace = destAC.getPlace();
+        checkReady();
       });
 
-      function updateButtonState() {
-        const btn = document.getElementById('calculate');
-        if (originPlace?.geometry && destPlace?.geometry) {
-          btn.disabled = false;
-          btn.classList.add('enabled');
-        }
+      function checkReady() {
+        // activeer de knop zodra beide plekken geparsed én een geometry hebben
+        calcBtn.disabled = !(
+          originPlace && originPlace.geometry &&
+          destPlace   && destPlace.geometry
+        );
       }
 
-      document.getElementById('calculate')
-        .addEventListener('click', () => {
-          const service = new google.maps.DistanceMatrixService();
-          service.getDistanceMatrix({
-            origins:      [ originPlace.geometry.location ],
-            destinations: [ destPlace.geometry.location ],
-            travelMode:   'DRIVING',
-            unitSystem:   google.maps.UnitSystem.METRIC
-          }, (response, status) => {
-            console.log('DM response:', status, response);
-            if (status !== 'OK') {
-              alert('Status error: ' + status);
-              return;
-            }
-            const elem = response.rows[0].elements[0];
-            if (elem.status !== 'OK') {
-              alert('Element error: ' + elem.status);
-              return;
-            }
-            const km    = elem.distance.value / 1000;
-            const price = Math.max(15, km * 2.5);
-            document.getElementById('priceVal').textContent = price.toFixed(2);
-            document.getElementById('output').style.display = 'block';
-          });
+      calcBtn.addEventListener('click', () => {
+        // call Distance Matrix
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix({
+          origins:      [ originPlace.geometry.location ],       // LatLng-object
+          destinations: [ destPlace.geometry.location ],         // LatLng-object
+          travelMode:   'DRIVING',
+          unitSystem:   google.maps.UnitSystem.METRIC
+        }, (response, status) => {
+          console.log('DistanceMatrix status:', status, response);
+          if (status !== 'OK') {
+            alert('Status error: ' + status);
+            return;
+          }
+          const element = response.rows[0].elements[0];
+          if (element.status !== 'OK') {
+            alert('Element error: ' + element.status);
+            return;
+          }
+          // toon afstand & duur
+          output.innerText =
+            `Afstand: ${element.distance.text} — Duur: ${element.duration.text}`;
         });
-    }
-  </script>
+      });
+    };
 
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete&v=weekly"
-    async defer>
+    // Poll until the API is ready, then init
+    function waitForMaps() {
+      if (window.google && google.maps && google.maps.places) {
+        initAutocomplete();
+      } else {
+        setTimeout(waitForMaps, 100);
+      }
+    }
+    waitForMaps();
   </script>
 </body>
 </html>
