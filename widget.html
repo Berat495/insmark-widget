@@ -5,39 +5,87 @@
   <title>Bezorgprijscalculator</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    /* --- Basis reset en fonts --- */
-    * { box-sizing: border-box; margin:0; padding:0; }
-    html,body { font-family: 'Helvetica Neue', Arial, sans-serif; background:#f5f5f5; }
-    .container { max-width:800px; margin:40px auto; padding:0 20px; }
-
-    /* --- Header --- */
-    h1 { text-align:center; margin-bottom:24px; font-size:2rem; }
-
-    /* --- Stapindicator --- */
-    .steps { display:flex; justify-content:space-between; margin-bottom:24px; }
-    .step { width:32px; height:32px; border-radius:50%; background:#ddd;
-            display:flex; align-items:center; justify-content:center; font-weight:bold; color:#555; }
-    .step.active { background:#2a9d8f; color:#fff; }
-
-    /* --- Hoofdformulier --- */
-    .form { background:#fff; padding:24px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); 
-            display:grid; grid-template-columns:1fr 1fr auto; gap:16px; align-items:end; }
-    .form label { font-weight:bold; margin-bottom:4px; display:block; }
-    .form input[type="text"] { width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; }
-    .btn { background:#2a9d8f; color:#fff; border:none; padding:12px 24px; font-size:1rem;
-           border-radius:4px; cursor:pointer; opacity:0.6; }
-    .btn.enabled { opacity:1; }
-
-    /* --- Resultaatweergave --- */
-    .result { text-align:center; margin-top:24px; font-size:1.5rem; display:none; }
-    .result span { font-weight:bold; font-size:2rem; color:#e76f51; }
+    * { box-sizing: border-box; margin:0; padding:0 }
+    html, body { font-family:"Helvetica Neue",Arial,sans-serif; background:#f5f5f5 }
+    .container {
+      max-width:800px;
+      margin:40px auto;
+      padding:0 20px;
+    }
+    h1 {
+      text-align:center;
+      margin-bottom:24px;
+      font-size:2rem;
+    }
+    .steps {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:24px;
+    }
+    .step {
+      width:32px; height:32px;
+      border-radius:50%;
+      background:#ddd;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      color:#555;
+    }
+    .step.active {
+      background:#2a9d8f;
+      color:#fff;
+    }
+    .form {
+      background:#fff;
+      padding:24px;
+      border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:16px;
+      align-items:end;
+    }
+    .form label {
+      display:block;
+      font-weight:bold;
+      margin-bottom:4px;
+    }
+    .form input {
+      width:100%;
+      padding:8px;
+      border:1px solid #ccc;
+      border-radius:4px;
+    }
+    .btn {
+      background:#2a9d8f;
+      color:#fff;
+      border:none;
+      padding:12px 24px;
+      font-size:1rem;
+      border-radius:4px;
+      cursor:pointer;
+      opacity:0.6;
+    }
+    .btn.enabled {
+      opacity:1;
+    }
+    .result {
+      text-align:center;
+      margin-top:24px;
+      font-size:1.5rem;
+      display:none;
+    }
+    .result span {
+      font-weight:bold;
+      font-size:2rem;
+      color:#e76f51;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Bezorgprijscalculator</h1>
-
-    <!-- stapindicator -->
     <div class="steps">
       <div class="step active">1</div>
       <div class="step">2</div>
@@ -46,31 +94,25 @@
       <div class="step">5</div>
       <div class="step">6</div>
     </div>
-
-    <!-- formulier -->
     <div class="form">
       <div>
         <label for="origin">Van</label>
         <input id="origin" type="text" placeholder="Straat, postcode of plaats">
       </div>
-
       <div>
         <label for="destination">Naar</label>
         <input id="destination" type="text" placeholder="Straat, postcode of plaats">
       </div>
-
       <button id="calculate" class="btn" disabled>Bereken prijs →</button>
     </div>
-
-    <!-- prijsresultaat -->
     <div id="output" class="result">
       € <span id="priceVal">0.00</span>
     </div>
   </div>
 
-  <!-- Google Maps JS (places + distanceMatrix) -->
+  <!-- Google Maps JS API met callback -->
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
     async defer>
   </script>
 
@@ -79,16 +121,14 @@
     let originPlace, destPlace;
 
     function initAutocomplete() {
-      const oInput = document.getElementById('origin');
-      const dInput = document.getElementById('destination');
-
-      autocompleteOrigin = new google.maps.places.Autocomplete(oInput, {
-        types: ['geocode']
-      });
-      autocompleteDest = new google.maps.places.Autocomplete(dInput, {
-        types: ['geocode']
-      });
-
+      autocompleteOrigin = new google.maps.places.Autocomplete(
+        document.getElementById('origin'),
+        { types: ['geocode'] }
+      );
+      autocompleteDest = new google.maps.places.Autocomplete(
+        document.getElementById('destination'),
+        { types: ['geocode'] }
+      );
       autocompleteOrigin.addListener('place_changed', () => {
         originPlace = autocompleteOrigin.getPlace();
         checkReady();
@@ -101,43 +141,32 @@
 
     function checkReady() {
       const btn = document.getElementById('calculate');
-      if (originPlace && originPlace.geometry &&
-          destPlace   && destPlace.geometry) {
+      if (originPlace?.geometry && destPlace?.geometry) {
         btn.disabled = false;
         btn.classList.add('enabled');
       }
     }
 
     function calculateDistanceAndPrice() {
-      const service = new google.maps.DistanceMatrixService();
-      service.getDistanceMatrix({
+      new google.maps.DistanceMatrixService().getDistanceMatrix({
         origins:      [ originPlace.formatted_address ],
         destinations: [ destPlace.formatted_address ],
         travelMode:   'DRIVING',
         unitSystem:   google.maps.UnitSystem.METRIC,
       }, (response, status) => {
-        if (status !== 'OK') {
+        if (status !== 'OK' || response.rows[0].elements[0].status !== 'OK') {
           alert('Er is iets misgegaan bij het opvragen van de afstand.');
           return;
         }
-        const element = response.rows[0].elements[0];
-        if (element.status !== 'OK') {
-          alert('Kon geen route vinden tussen de adressen.');
-          return;
-        }
-        const distanceKm = element.distance.value / 1000; // meters → km
-        // ** Hier pas je je prijscalculatie aan **
-        // Voorbeeld: € 2,50 per km, minimum € 15
-        let price = Math.max(15, distanceKm * 2.5);
+        const meters = response.rows[0].elements[0].distance.value;
+        const km     = meters / 1000;
+        // Tarief: €2,50 per km, minimum €15
+        let price = Math.max(15, km * 2.5);
         document.getElementById('priceVal').textContent = price.toFixed(2);
         document.getElementById('output').style.display = 'block';
       });
     }
 
-    // Wacht tot de Google Bibliotheek geladen is
-    window.initAutocomplete = initAutocomplete;
-
-    // Koppel de knop
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('calculate')
               .addEventListener('click', calculateDistanceAndPrice);
