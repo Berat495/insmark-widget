@@ -1,115 +1,80 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Bezorgprijscalculator</title>
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0 }
-    body { font-family: sans-serif; background: #f2f3f5; color: #333; }
-    .card { background: #fff; border-radius:12px; padding:24px; max-width:800px;
-            margin:40px auto; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
-    h1 { text-align:center; margin-bottom:24px; }
-    .form-row { display:flex; gap:16px; flex-wrap:wrap; }
-    .form-group { flex:1; min-width:200px; display:flex; flex-direction:column; }
-    label { margin-bottom:8px; font-weight:500; }
-    input, button { padding:12px; font-size:1rem; border:1px solid #ccc; border-radius:6px; }
-    button { background:#3c8e76; color:#fff; border:none; cursor:pointer; transition:background .2s; }
-    button:disabled { background:#aac8b8; cursor:not-allowed; }
-    button:hover:not(:disabled) { background:#347a62; }
-    .result { margin-top:24px; font-size:1.2rem; text-align:center; }
-  </style>
-</head>
-<body>
+<!-- ↓↓↓  BEGIN INSMARK WIDGET  ↓↓↓ -->
+<style>
+  /* minimale styling */
+  #insmark-widget{max-width:800px;margin:40px auto;background:#fff;border-radius:12px;
+    padding:24px;box-shadow:0 4px 12px rgba(0,0,0,0.05);font-family:Roboto,sans-serif;}
+  #insmark-widget h2{text-align:center;margin-bottom:24px;font-size:1.75rem;}
+  #insmark-widget .row{display:flex;gap:12px;align-items:flex-end;}
+  #insmark-widget .row > div{flex:1;}
+  #insmark-widget input{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;}
+  #insmark-widget button{padding:10px 16px;background:#3c8e76;color:#fff;
+    border:none;border-radius:6px;cursor:pointer;font-size:1rem;}
+  #insmark-widget button:disabled{background:#aac8b8;cursor:not-allowed;}
+</style>
 
-  <div class="card">
-    <h1>Bezorgprijscalculator</h1>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="origin">Van</label>
-        <input id="origin" type="text" placeholder="Straat, postcode of plaats">
-      </div>
-      <div class="form-group">
-        <label for="destination">Naar</label>
-        <input id="destination" type="text" placeholder="Straat, postcode of plaats">
-      </div>
-      <div class="form-group" style="flex:0 0 auto; align-self:flex-end;">
-        <button id="calcBtn" disabled>Bereken afstand</button>
-      </div>
+<div id="insmark-widget">
+  <h2>Bezorgprijs-calculator</h2>
+  <div class="row">
+    <div>
+      <label for="ins-origin">Van</label>
+      <input id="ins-origin" placeholder="Straat, postcode of plaats">
     </div>
-
-    <div id="result" class="result hidden"></div>
+    <div>
+      <label for="ins-dest">Naar</label>
+      <input id="ins-dest" placeholder="Straat, postcode of plaats">
+    </div>
+    <div style="flex:0 0 auto">
+      <button id="ins-go" disabled>Bereken afstand</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    let originLatLng = null;
-    let destLatLng   = null;
-    let distanceMeters = 0, durationSec = 0;
+<script>
+  // globale vars voor latLng
+  let _insOrigin=null, _insDest=null;
+  function insInit(){
+    const ori=document.getElementById('ins-origin');
+    const dst=document.getElementById('ins-dest');
+    const btn=document.getElementById('ins-go');
 
-    function initAutocomplete() {
-      const oriInput = document.getElementById('origin');
-      const dstInput = document.getElementById('destination');
-      const btn      = document.getElementById('calcBtn');
-      const resultEl = document.getElementById('result');
+    const acO = new google.maps.places.Autocomplete(ori,{componentRestrictions:{country:'nl'}});
+    const acD = new google.maps.places.Autocomplete(dst,{componentRestrictions:{country:'nl'}});
 
-      const oriAC = new google.maps.places.Autocomplete(oriInput, {
-        componentRestrictions:{ country:'nl' }
+    acO.addListener('place_changed',()=>{
+      const p=acO.getPlace();
+      _insOrigin = p.geometry?.location||null;
+      btn.disabled = !_insOrigin||!_insDest;
+    });
+    acD.addListener('place_changed',()=>{
+      const p=acD.getPlace();
+      _insDest = p.geometry?.location||null;
+      btn.disabled = !_insOrigin||!_insDest;
+    });
+
+    btn.addEventListener('click',()=>{
+      const svc=new google.maps.DistanceMatrixService();
+      svc.getDistanceMatrix({
+        origins:      [_insOrigin],
+        destinations: [_insDest],
+        travelMode:   google.maps.TravelMode.DRIVING,
+        unitSystem:   google.maps.UnitSystem.METRIC,
+      },(resp,status)=>{
+        if(status!=='OK'
+           || !resp.rows.length
+           || resp.rows[0].elements[0].status!=='OK'){
+          return alert('Afstands­berekening mislukt – probeer opnieuw.');
+        }
+        const el = resp.rows[0].elements[0];
+        // hier kun je door naar stap 2 van je form, óf:
+        alert(`Afstand: ${el.distance.text}\nDuur: ${el.duration.text}`);
       });
-      const dstAC = new google.maps.places.Autocomplete(dstInput, {
-        componentRestrictions:{ country:'nl' }
-      });
+    });
+  }
+</script>
 
-      oriAC.addListener('place_changed', () => {
-        const p = oriAC.getPlace();
-        originLatLng = p.geometry?.location || null;
-        btn.disabled = !(originLatLng && destLatLng);
-        resultEl.classList.add('hidden');
-      });
-
-      dstAC.addListener('place_changed', () => {
-        const p = dstAC.getPlace();
-        destLatLng = p.geometry?.location || null;
-        btn.disabled = !(originLatLng && destLatLng);
-        resultEl.classList.add('hidden');
-      });
-
-      btn.addEventListener('click', () => {
-        if (!originLatLng || !destLatLng) return;
-        const svc = new google.maps.DistanceMatrixService();
-        svc.getDistanceMatrix({
-          origins:      [ originLatLng ],
-          destinations: [ destLatLng ],
-          travelMode:   google.maps.TravelMode.DRIVING,
-          unitSystem:   google.maps.UnitSystem.METRIC,
-        }, (resp, status) => {
-          if (status !== 'OK'
-              || !resp.rows?.length
-              || resp.rows[0].elements[0].status !== 'OK') {
-            resultEl.textContent = 'Fout bij opvragen afstand.';
-            resultEl.classList.remove('hidden');
-            return;
-          }
-          const el = resp.rows[0].elements[0];
-          distanceMeters = el.distance.value;
-          durationSec    = el.duration.value;
-          // laat alleen het resultaat zien, bewaar meters/sec voor verder
-          const km   = (distanceMeters/1000).toFixed(1);
-          const min  = Math.round(durationSec/60);
-          resultEl.textContent = `Afstand: ${km} km — Duur: ${min} min`;
-          resultEl.classList.remove('hidden');
-
-          // NU kun je verdergaan met je prijsberekening:
-          // b.v. price = base + km * tarief + duur * tarief2 …
-          // en dat opslaan in variabelen voor “definitieve prijs” in een vervolgvraag.
-        });
-      });
-    }
-  </script>
-
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
-    async defer>
-  </script>
-</body>
-</html>
+<!-- laad Maps & Places, voert callback uit zodra JS geladen is -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=insInit"
+  async defer>
+</script>
+<!-- ↑↑↑  EINDE INSMARK WIDGET  ↑↑↑ -->
