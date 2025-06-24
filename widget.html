@@ -5,30 +5,70 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Offerte Ritprijs Insmark</title>
   <style>
-    /* ------ Basis ------ */
+    /* ===== Basis ===== */
     * { box-sizing:border-box; margin:0; padding:0 }
-    body { font-family:sans-serif; background:#f2f3f5; }
-    #widget { max-width:600px; margin:40px auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 6px 24px rgba(0,0,0,0.12); }
+    body { font-family:Arial,sans-serif; background:#f2f3f5; }
+    #widget {
+      max-width:640px; margin:40px auto; padding:32px;
+      background:#fff; border-radius:12px;
+      box-shadow:0 6px 24px rgba(0,0,0,0.1);
+    }
     h2 { text-align:center; margin-bottom:24px; color:#0073e6; }
-    .stepper { display:flex; justify-content:space-between; margin-bottom:24px; }
-    .step { width:32px; height:32px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; color:#555; }
+
+    /* ===== Stepper ===== */
+    .stepper {
+      display:flex; justify-content:space-between;
+      margin-bottom:24px;
+    }
+    .step {
+      width:32px; height:32px; line-height:32px;
+      border-radius:50%; background:#ddd;
+      color:#555; text-align:center;
+    }
     .step.active { background:#0073e6; color:#fff; }
 
-    /* ------ Steps ------ */
+    /* ===== Steps content ===== */
     .step-content { display:none; }
     .step-content.active { display:block; }
 
-    label { display:block; margin-bottom:16px; font-size:0.9rem; }
-    input, select, button { width:100%; padding:10px; font-size:1rem; border:1px solid #ccc; border-radius:6px; }
-    input[readonly] { background:#eee; }
-    .buttons { display:flex; gap:12px; margin-top:16px; }
-    .buttons button { flex:1; cursor:pointer; }
-    .buttons .prev { background:#ccc; }
-    .buttons .next { background:#0073e6; color:#fff; }
-    .buttons .submit { background:#28a745; color:#fff; }
+    label {
+      display:block; margin-bottom:16px;
+      font-size:0.95rem; color:#333;
+    }
+    label span { display:block; margin-bottom:6px; }
 
-    .summary { background:#e6f4ff; border:1px solid #b3daff; padding:16px; border-radius:6px; margin-bottom:16px; }
-    .summary p { margin-bottom:8px; font-weight:600; color:#005bb5; }
+    input, select, button {
+      width:100%; padding:10px 12px;
+      font-size:1rem; border:1px solid #ccc;
+      border-radius:6px;
+    }
+    input[readonly] { background:#f9f9f9; }
+
+    .buttons {
+      display:flex; gap:12px; margin-top:24px;
+    }
+    .buttons button {
+      flex:1; padding:12px; font-size:1rem;
+      border:none; border-radius:6px;
+      cursor:pointer; transition:background .2s;
+    }
+    .prev { background:#ccc; color:#333; }
+    .next { background:#0073e6; color:#fff; }
+    .submit { background:#28a745; color:#fff; }
+
+    /* ===== Samenvatting ===== */
+    .summary {
+      background:#e6f4ff; border:1px solid #b3daff;
+      padding:16px; border-radius:6px; margin-bottom:24px;
+    }
+    .summary p {
+      margin-bottom:8px; font-weight:600; color:#005bb5;
+    }
+    .price {
+      font-size:1.2rem; text-align:center;
+      margin-bottom:16px; color:#0073e6;
+      font-weight:bold;
+    }
   </style>
 </head>
 <body>
@@ -47,15 +87,15 @@
   <form id="ritprijs-form"
         action="https://formspree.io/f/xvgrwnbl"
         method="POST">
-    <!-- stap 1: adressen & afstand -->
+    <!-- STAP 1: Adressen & Afstand -->
     <div class="step-content active" data-step="1">
-      <label>Ophaaladres
+      <label><span>Ophaaladres</span>
         <input id="pickup-address" name="Ophaaladres" type="text" required placeholder="Straat en huisnummer, plaats">
       </label>
-      <label>Afleveradres
+      <label><span>Afleveradres</span>
         <input id="delivery-address" name="Afleveradres" type="text" required placeholder="Straat en huisnummer, plaats">
       </label>
-      <label>Afstand (km)
+      <label><span>Afstand (km)</span>
         <input id="distance" name="Afstand" type="text" readonly placeholder="Klik op Bereken afstand">
       </label>
       <div class="buttons">
@@ -63,19 +103,17 @@
       </div>
     </div>
 
-    <!-- stap 2: pakket -->
+    <!-- STAP 2: Pakketdetails -->
     <div class="step-content" data-step="2">
-      <label>Gewicht (kg)
+      <label><span>Gewicht (kg)</span>
         <input name="Gewicht" type="number" step="0.1" required placeholder="bv. 5.0">
       </label>
-      <label>Lengte (cm)
-        <input name="Lengte" type="number" min="0" required placeholder="bv. 50">
-      </label>
-      <label>Breedte (cm)
-        <input name="Breedte" type="number" min="0" required placeholder="bv. 40">
-      </label>
-      <label>Hoogte (cm)
-        <input name="Hoogte" type="number" min="0" required placeholder="bv. 30">
+      <label><span>Afmetingen (L×B×H in cm)</span>
+        <div style="display:flex;gap:8px;">
+          <input name="Lengte" type="number" min="0" required placeholder="L">
+          <input name="Breedte" type="number" min="0" required placeholder="B">
+          <input name="Hoogte" type="number" min="0" required placeholder="H">
+        </div>
       </label>
       <div class="buttons">
         <button type="button" class="prev">Vorige</button>
@@ -83,12 +121,12 @@
       </div>
     </div>
 
-    <!-- stap 3: verdieping -->
+    <!-- STAP 3: Verdiepingen -->
     <div class="step-content" data-step="3">
-      <label>Ophalen verdieping
+      <label><span>Ophalen verdieping</span>
         <input name="OphalenVerdieping" type="number" min="0" value="0">
       </label>
-      <label>Afleveren verdieping
+      <label><span>Afleveren verdieping</span>
         <input name="AfleverenVerdieping" type="number" min="0" value="0">
       </label>
       <div class="buttons">
@@ -97,9 +135,9 @@
       </div>
     </div>
 
-    <!-- stap 4: gebouwtypes -->
+    <!-- STAP 4: Gebouwtypes -->
     <div class="step-content" data-step="4">
-      <label>Gebouwtype ophalen
+      <label><span>Gebouwtype ophalen</span>
         <select name="GebouwTypeOphalen">
           <option>Woning</option>
           <option>Bedrijf</option>
@@ -107,7 +145,7 @@
           <option>Veiling</option>
         </select>
       </label>
-      <label>Gebouwtype afleveren
+      <label><span>Gebouwtype afleveren</span>
         <select name="GebouwTypeAfleveren">
           <option>Woning</option>
           <option>Bedrijf</option>
@@ -121,14 +159,14 @@
       </div>
     </div>
 
-    <!-- stap 5: extra hulp & lift -->
+    <!-- STAP 5: Extra diensten -->
     <div class="step-content" data-step="5">
-      <label>Extra hulp nodig?
+      <label><span>Extra hulp nodig?</span>
         <select name="ExtraHulp">
           <option>Nee</option><option>Ja</option>
         </select>
       </label>
-      <label>Lift aanwezig?
+      <label><span>Lift aanwezig?</span>
         <select name="LiftAanwezig">
           <option>Ja</option><option>Nee</option>
         </select>
@@ -139,142 +177,123 @@
       </div>
     </div>
 
-    <!-- stap 6: samenvatting & verzenden -->
+    <!-- STAP 6: Samenvatting & Prijs -->
     <div class="step-content" data-step="6">
-      <div class="summary" id="summary-box">
-        <!-- wordt in JS gevuld -->
-      </div>
+      <div class="summary" id="summary-box"></div>
+      <div class="price" id="price-box"></div>
       <div class="buttons">
         <button type="button" class="prev">Vorige</button>
         <button type="submit" class="submit">Verstuur aanvraag</button>
       </div>
     </div>
 
-    <!-- verberg deze velden, Formspree verifieert replyto -->
+    <!-- Voor Formspree reply-to -->
     <input type="hidden" name="_replyto" id="hidden-replyto">
   </form>
 </div>
 
 
 <script>
-  // ---- stappen logica ----
+  // Stapnavigatie
   let currentStep = 1;
-  const totalSteps = 6;
   const steps = document.querySelectorAll('.step');
   const contents = document.querySelectorAll('.step-content');
-
   function showStep(n) {
-    // stapindicator
     steps.forEach((s,i)=> s.classList.toggle('active', i===n-1));
-    // inhoud
     contents.forEach(c=> c.classList.remove('active'));
     document.querySelector(`.step-content[data-step="${n}"]`)
             .classList.add('active');
     currentStep = n;
   }
-
-  // Vorige/Volgende knoppen
-  document.querySelectorAll('.next').forEach(btn=>{
-    btn.onclick = ()=> {
-      if (currentStep<totalSteps) showStep(currentStep+1);
-      if (currentStep===totalSteps) fillSummary();
-    };
+  document.querySelectorAll('.next').forEach(b=>b.onclick = ()=>{
+    if (currentStep < 6) showStep(currentStep+1);
+    if (currentStep+1 === 6) buildSummary();
   });
-  document.querySelectorAll('.prev').forEach(btn=>{
-    btn.onclick = ()=> {
-      if (currentStep>1) showStep(currentStep-1);
-    };
+  document.querySelectorAll('.prev').forEach(b=>b.onclick = ()=>{
+    if (currentStep > 1) showStep(currentStep-1);
   });
 
 
-  // ---- Google Maps Autocomplete & Afstand ----
-  let pickupLatLng=null, deliveryLatLng=null, distanceKm=0;
-  function initAutocomplete() {
-    const pInput = new google.maps.places.Autocomplete(
+  // Google Maps Autocomplete & afstand
+  let pickupLatLng, deliveryLatLng, distanceKm=0;
+  function initAutocomplete(){
+    const pAC = new google.maps.places.Autocomplete(
       document.getElementById('pickup-address'),
-      { componentRestrictions:{ country:'nl' } }
+      {componentRestrictions:{country:'nl'}}
     );
-    const dInput = new google.maps.places.Autocomplete(
+    const dAC = new google.maps.places.Autocomplete(
       document.getElementById('delivery-address'),
-      { componentRestrictions:{ country:'nl' } }
+      {componentRestrictions:{country:'nl'}}
     );
-    pInput.addListener('place_changed', ()=> {
-      const pl = pInput.getPlace();
-      pickupLatLng = pl.geometry?.location||null;
-    });
-    dInput.addListener('place_changed', ()=> {
-      const pl = dInput.getPlace();
-      deliveryLatLng = pl.geometry?.location||null;
-    });
+    pAC.addListener('place_changed',_=>pickupLatLng = pAC.getPlace().geometry?.location);
+    dAC.addListener('place_changed',_=>deliveryLatLng = dAC.getPlace().geometry?.location);
 
     document.getElementById('btn-calc-distance')
-      .addEventListener('click', ()=> {
-      if (!pickupLatLng||!deliveryLatLng) {
-        return alert('Selecteer eerst geldige adressen.');
-      }
-      new google.maps.DistanceMatrixService().getDistanceMatrix({
-        origins:      [pickupLatLng],
-        destinations: [deliveryLatLng],
-        travelMode:   google.maps.TravelMode.DRIVING,
-        unitSystem:   google.maps.UnitSystem.METRIC
-      }, (resp,status)=>{
-        if (status!=='OK' || !resp.rows.length
-            || resp.rows[0].elements[0].status!=='OK') {
-          return alert('Kon afstand niet ophalen.');
+      .onclick = ()=>{
+        if (!pickupLatLng||!deliveryLatLng) {
+          return alert('Selecteer eerst geldige adressen.');
         }
-        distanceKm = resp.rows[0].elements[0].distance.value/1000;
-        document.getElementById('distance')
-                .value = distanceKm.toFixed(1)+' km';
-        // zet replyto op email-veld
-        document.getElementById('hidden-replyto')
-                .value = document.getElementById('_replyto')?.value||'';
-        // ga door naar stap2
-        showStep(2);
-      });
-    });
+        new google.maps.DistanceMatrixService().getDistanceMatrix({
+          origins: [pickupLatLng],
+          destinations: [deliveryLatLng],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC
+        },(resp,sts)=>{
+          if (sts!=='OK'
+           || resp.rows[0].elements[0].status!=='OK') {
+            return alert('Afstand kon niet worden bepaald.');
+          }
+          distanceKm = resp.rows[0].elements[0].distance.value/1000;
+          document.getElementById('distance').value = distanceKm.toFixed(1)+' km';
+          // bewaar reply-to (mailadres)
+          document.getElementById('hidden-replyto').value =
+            document.querySelector('input[type=email]')?.value||'';
+          showStep(2);
+        });
+      };
   }
 
-  // ---- Samenvatting bouwen ----
-  function fillSummary() {
+  // Samenvatting + prijs berekenen
+  function buildSummary(){
     const f = document.getElementById('ritprijs-form');
-    // prijsberekening voorbeeld
     const kg = parseFloat(f.Gewicht.value);
-    const vol = (parseFloat(f.Lengte.value)||0)
-              * (parseFloat(f.Breedte.value)||0)
-              * (parseFloat(f.Hoogte.value)||0)
-              /1000000; // m³
-    const prijs = (30 + 1*distanceKm + 0.4*Math.max(kg,vol*1000))
+    const L = parseFloat(f.Lengte.value),
+          B = parseFloat(f.Breedte.value),
+          H = parseFloat(f.Hoogte.value);
+    const volumeM3 = (L*B*H)/1e6; // m³
+    const price = (30 + 1*distanceKm + 0.4*Math.max(kg, volumeM3*1000))
                   .toFixed(2);
-
-    // invisble velden voor Formspree
-    // bewaart afstand en prijs mee
-    let inpDist = f.Afstand;
-    let inpPrijs = f.Prijs;
-    if (!inpPrijs) {
-      inpPrijs = document.createElement('input');
-      inpPrijs.type='hidden'; inpPrijs.name='Prijs';
-      f.appendChild(inpPrijs);
-    }
-    inpDist.value = distanceKm.toFixed(1);
-    inpPrijs.value = prijs;
-
+    // summary box
     document.getElementById('summary-box').innerHTML = `
-      <p>Ophaal: ${f.Ophaaladres.value}</p>
-      <p>Aflever: ${f.Afleveradres.value}</p>
-      <p>Afstand: ${distanceKm.toFixed(1)} km</p>
-      <p>Gewicht: ${kg} kg</p>
-      <p>Volume: ${(vol*1000).toFixed(0)} liter</p>
-      <p>Geschatte ritprijs: € ${prijs}</p>
+      <p><strong>Ophaal:</strong> ${f.Ophaaladres.value}</p>
+      <p><strong>Aflever:</strong> ${f.Afleveradres.value}</p>
+      <p><strong>Afstand:</strong> ${distanceKm.toFixed(1)} km</p>
+      <p><strong>Gewicht:</strong> ${kg} kg</p>
+      <p><strong>Volume:</strong> ${(volumeM3*1000).toFixed(0)} liter</p>
+      <p><strong>Verdiepingen:</strong> Ophalen ${f.OphalenVerdieping.value}, Afleveren ${f.AfleverenVerdieping.value}</p>
+      <p><strong>Gebouwtype:</strong> Ophalen ${f.GebouwTypeOphalen.value}, Afleveren ${f.GebouwTypeAfleveren.value}</p>
+      <p><strong>Extra hulp:</strong> ${f.ExtraHulp.value}, Lift ${f.LiftAanwezig.value}</p>
     `;
+    document.getElementById('price-box').textContent =
+      `Geschatte ritprijs: € ${price}`;
+    // bewaar in verborgen veld
+    let inp = f.querySelector('input[name="Prijs"]');
+    if (!inp) {
+      inp = document.createElement('input');
+      inp.type='hidden'; inp.name='Prijs';
+      f.appendChild(inp);
+    }
+    inp.value = price;
   }
 
-  // start op step 1
+  // start
   showStep(1);
 </script>
 
-<!-- Google Maps JS + Places -->
+<!-- Google Maps + Places -->
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc&libraries=places&callback=initAutocomplete"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy6opG7A2AgleOq_q2AXtJ6wrn2eJQJsc
+    &libraries=places&callback=initAutocomplete"
   async defer>
 </script>
 </body>
