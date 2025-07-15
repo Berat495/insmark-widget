@@ -377,16 +377,16 @@
     });
     const totalKg = gewichten.reduce((a,b)=>a+b,0);
     const totalVol = volumeres.reduce((a,b)=>a+b,0);
-    // prijs = basis + km + 0.4×max(kg,vol×1000)
+    // prijs = basis + km + 0.4×max(kg,vol)
     const prijs = (
-      30 + distanceKm + 0.4*Math.max(totalKg, totalVol*1000)
+      30 + distanceKm + 0.4*Math.max(totalKg, totalVol)
     ).toFixed(2);
 
     // Samenvatting tekst
     let html = `
       <p>Afstand: ${distanceKm.toFixed(1)} km</p>
       <p>Totaal gewicht: ${totalKg.toFixed(1)} kg</p>
-      <p>Totaal volume: ${(totalVol*1000).toFixed(0)} liter</p>
+      <p>Totaal volume: ${(totalVol).toFixed(0)} liter</p>
       <p>Verzonden pakketten: ${gewichten.length}</p>
     `;
     document.getElementById('summary-box').innerHTML = html;
